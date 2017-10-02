@@ -103,8 +103,6 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 					//Number of nearby entities (using methods from World class)
 					int nearbyEntityCount = a().a(entity.getClass(),axisAligned).size();
 					
-					Bukkit.getServer().broadcastMessage("Nearby Entity Count: " + nearbyEntityCount);
-					
 					//If the number of entities nearby is greater then the maximum then don't spawn (return)
 					if (nearbyEntityCount >= this.maxNearbyEntities) {
 						h();
@@ -175,20 +173,33 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 		a(1);
 	}
 
+	//Spawn the entity method
 	private Entity a(Entity entity, boolean flag) {
+		//If spawner's spawn data isn't null
 		if (i() != null) {
 			NBTTagCompound nbttagcompound = new NBTTagCompound();
 
+			//Set entity ID to the nbttag then populate the tag with all the other information
 			entity.d(nbttagcompound);
+			
+			//Iterator for all of the NBTBase in the spawners NBTCompound
 			Iterator iterator = i().c.c().iterator();
+			
+			//Loop all of them
 			while (iterator.hasNext()) {
+				//Key saved in map
 				String s = (String) iterator.next();
+				//NBTBase from the key
 				NBTBase nbtbase = i().c.get(s);
-
+				
+				//set all the data to the newly created map.
 				nbttagcompound.set(s, nbtbase.clone());
 			}
 
+			//Loads NBT data to the entity from the NBT compound
 			entity.f(nbttagcompound);
+			
+			//Add entity to the world (Spawns a visible entity)
 			if ((entity.world != null) && (flag)) {
 				entity.world.addEntity(entity, CreatureSpawnEvent.SpawnReason.SPAWNER);
 			}
@@ -198,6 +209,7 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 			b(spawnData);
 			entity.setCustomName(spawnData.getString("MobDisplayName"));
 
+			//Compound for riding entities (Jockey)
 			NBTTagCompound nbttagcompound1;
 
 			// Riding entities (Jockey)
@@ -224,10 +236,13 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 				}
 				entity1 = entity2;
 			}
-		} else if (((entity instanceof EntityLiving)) && (entity.world != null) && (flag)) {
+		}
+		//If the spawners data is null but the entity should still spawn 
+		else if (((entity instanceof EntityLiving)) && (entity.world != null) && (flag)) {
 			if ((entity instanceof EntityInsentient)) {
 				((EntityInsentient) entity).prepare(entity.world.E(new BlockPosition(entity)), null);
 			}
+			//Spawns entity
 			entity.world.addEntity(entity, CreatureSpawnEvent.SpawnReason.SPAWNER);
 
 			NBTTagCompound spawnData = new NBTTagCompound();
