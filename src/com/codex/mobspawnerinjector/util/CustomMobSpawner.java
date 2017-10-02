@@ -87,58 +87,68 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 					return;
 				}
 				
-				boolean flag = false;
-				
 				//Loops for every spawn count (I believe this is the maximum number of mobs the spawner can spawn) -- set to 4
 				for (int i = 0; i < this.spawnCount; i++) {
 					//Create entity based on spawner type
 					Entity entity = EntityTypes.createEntityByName(getMobName(), a());
+					
 					if (entity == null) {
 						return;
 					}
-					
+
 					AxisAlignedBB axisAligned = new AxisAlignedBB(blockposition.getX(), blockposition.getY(), blockposition.getZ(),
 							blockposition.getX() + 1, blockposition.getY() + 1, blockposition.getZ() + 1)
 									.grow(this.spawnRange, this.spawnRange, this.spawnRange);
 					
 					//Number of nearby entities (using methods from World class)
-					int j = a().a(entity.getClass(),axisAligned).size();
+					int nearbyEntityCount = a().a(entity.getClass(),axisAligned).size();
 					
-					Bukkit.getServer().broadcastMessage(j +"");
+					Bukkit.getServer().broadcastMessage("Nearby Entity Count: " + nearbyEntityCount);
 					
-					if (j >= this.maxNearbyEntities) {
+					//If the number of entities nearby is greater then the maximum then don't spawn (return)
+					if (nearbyEntityCount >= this.maxNearbyEntities) {
 						h();
 						return;
 					}
-					double d01 = blockposition.getX()
+					
+					//Get random location within spawn range to spawn the mob
+					double randomX = blockposition.getX()
 							+ (a().random.nextDouble() - a().random.nextDouble()) * this.spawnRange + 0.5D;
-					double d3 = blockposition.getY() + a().random.nextInt(3) - 1;
-					double d4 = blockposition.getZ()
+					double randomY = blockposition.getY() + a().random.nextInt(3) - 1;
+					double randomZ = blockposition.getZ()
 							+ (a().random.nextDouble() - a().random.nextDouble()) * this.spawnRange + 0.5D;
-					EntityInsentient entityinsentient = (entity instanceof EntityInsentient) ? (EntityInsentient) entity
-							: null;
+					
+					//Check if the entity can be casted to EntityInsentient
+					EntityInsentient entityinsentient = (entity instanceof EntityInsentient) ? (EntityInsentient) entity : null;
 
-					entity.setPositionRotation(d01, d3, d4, a().random.nextFloat() * 360.0F, 0.0F);
+					//Set entity location to the spawn location (entity object is created already) 
+					//NOTE: This does not actually "spawn" the entity. 
+					//It only sets the location of the entity object to the desired location.
+					entity.setPositionRotation(randomX, randomY, randomZ, a().random.nextFloat() * 360.0F, 0.0F);
+					
+					//If entity is actually a spawnable entity
 					if ((entityinsentient == null) || ((entityinsentient.bR()) && (entityinsentient.canSpawn()))) {
-						// spawns entity
+						
+						// Runs the a method -- (Refer to a)
 						a(entity, true);
 
-						// Particle effects ON SPAWN
-
+						// Firework when the entity spawns
 						Location loc = new Location(entity.getWorld().getWorld(), (double) blockposition.getX(),
 								(double) blockposition.getY(), (double) blockposition.getZ());
 						FireworkUtil.spawnRandomFirework(loc);
 
+						//This code is for the smoke and flame particles. TODO: Replace with custom particles
+						
 						// a().triggerEffect(2004, blockposition, 0);
-						if (entityinsentient != null) {
+						//if (entityinsentient != null) {
 							// entityinsentient.y();
-						}
-						flag = true;
+						//}
+				
+						h();
 					}
 				}
-				if (flag) {
-					h();
-				}
+				
+				
 			}
 		}
 	}
