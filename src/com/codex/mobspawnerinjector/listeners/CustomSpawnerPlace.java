@@ -1,5 +1,8 @@
 package com.codex.mobspawnerinjector.listeners;
 
+import java.lang.reflect.Field;
+
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftCreatureSpawner;
@@ -11,7 +14,6 @@ import com.codex.mobspawnerinjector.util.CustomMobSpawner;
 
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Blocks;
-import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.TileEntityMobSpawner;
 import net.minecraft.server.v1_8_R3.World;
 
@@ -39,13 +41,22 @@ public class CustomSpawnerPlace implements Listener {
 				tile.getWorld().playBlockAction(tile.getPosition(), Blocks.MOB_SPAWNER, paramAnonymousInt, 0);
 			}
 		};
-		NBTTagCompound nbt = new NBTTagCompound();
-
-		//Populates nbt with spawners data
-		customSpawner.b(nbt);
 		
-		//Sets tile nbt to the NBT
-		tile.a(nbt);
+		try {
+			Field spawnerField = tile.getClass().getDeclaredField("a");
+			spawnerField.setAccessible(true);
+			
+			spawnerField.set(tile, customSpawner);
+			
+		} catch (NoSuchFieldException x) {
+			x.printStackTrace();
+		} catch (SecurityException x) {
+			x.printStackTrace();
+		} catch (IllegalArgumentException e1) {
+			e1.printStackTrace();
+		} catch (IllegalAccessException e1) {
+			e1.printStackTrace();
+		}
 		
 	}
 

@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import com.google.common.collect.Lists;
@@ -15,10 +17,12 @@ import net.minecraft.server.v1_8_R3.EntityInsentient;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.EntityMinecartAbstract;
 import net.minecraft.server.v1_8_R3.EntityTypes;
+import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.MobSpawnerAbstract;
 import net.minecraft.server.v1_8_R3.NBTBase;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.NBTTagList;
+import net.minecraft.server.v1_8_R3.NBTTagString;
 import net.minecraft.server.v1_8_R3.UtilColor;
 import net.minecraft.server.v1_8_R3.WeightedRandom;
 
@@ -53,23 +57,44 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 	    return i().d;
 	  }
 	  
+	  //If player in range
 	public boolean g(){
 		BlockPosition blockposition = b();
 		return a().isPlayerNearby(blockposition.getX() + 0.5D, blockposition.getY() + 0.5D, blockposition.getZ() + 0.5D, this.requiredPlayerRange);
 	}
 
-	  public void c()
-	  {
-	    if (g())
-	    {
+	//ALWAYS RUNNING (TICK)
+	@Override
+	  public void c() {
+	    if (g()) {
 	      BlockPosition blockposition = b();
 	      if (a().isClientSide)
 	      {
-	    	  Bukkit.getServer().broadcastMessage("Test");
+	          double d1 = blockposition.getX() + a().random.nextFloat();
+	          double d2 = blockposition.getY() + a().random.nextFloat();
+	          
+	          double d0 = blockposition.getZ() + a().random.nextFloat();
+	          a().addParticle(EnumParticle.SMOKE_NORMAL, d1, d2, d0, 0.0D, 0.0D, 0.0D, new int[0]);
+	          a().addParticle(EnumParticle.FLAME, d1, d2, d0, 0.0D, 0.0D, 0.0D, new int[0]);
+	          if (this.spawnDelay > 0) {
+	            this.spawnDelay -= 1;
+	          }
+	          this.f = this.e;
+	          this.e = ((this.e + 1000.0F / (this.spawnDelay + 200.0F)) % 360.0D);
 	      }
 	      else
 	      {
-	    	  Bukkit.getServer().broadcastMessage("Test2");
+	          double d1 = blockposition.getX() + a().random.nextFloat();
+	          double d2 = blockposition.getY() + a().random.nextFloat();
+	          
+	          double d0 = blockposition.getZ() + a().random.nextFloat();
+	          a().addParticle(EnumParticle.SMOKE_NORMAL, d1, d2, d0, 0.0D, 0.0D, 0.0D, new int[0]);
+	          a().addParticle(EnumParticle.FLAME, d1, d2, d0, 0.0D, 0.0D, 0.0D, new int[0]);
+	          if (this.spawnDelay > 0) {
+	            this.spawnDelay -= 1;
+	          }
+	          this.f = this.e;
+	          this.e = ((this.e + 1000.0F / (this.spawnDelay + 200.0F)) % 360.0D);
 	        if (this.spawnDelay == -1) {
 	          h();
 	        }
@@ -91,18 +116,29 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 	            h();
 	            return;
 	          }
-	          double d0 = blockposition.getX() + (a().random.nextDouble() - a().random.nextDouble()) * this.spawnRange + 0.5D;
+	          double d01 = blockposition.getX() + (a().random.nextDouble() - a().random.nextDouble()) * this.spawnRange + 0.5D;
 	          double d3 = blockposition.getY() + a().random.nextInt(3) - 1;
 	          double d4 = blockposition.getZ() + (a().random.nextDouble() - a().random.nextDouble()) * this.spawnRange + 0.5D;
 	          EntityInsentient entityinsentient = (entity instanceof EntityInsentient) ? (EntityInsentient)entity : null;
 	          
-	          entity.setPositionRotation(d0, d3, d4, a().random.nextFloat() * 360.0F, 0.0F);
-	          if ((entityinsentient == null) || ((entityinsentient.bR()) && (entityinsentient.canSpawn())))
-	          {
+	          entity.setPositionRotation(d01, d3, d4, a().random.nextFloat() * 360.0F, 0.0F);
+	          if ((entityinsentient == null) || ((entityinsentient.bR()) && (entityinsentient.canSpawn()))) {
+	        	  //spawns entity
 	            a(entity, true);
-	            a().triggerEffect(2004, blockposition, 0);
+
+		        NBTTagCompound entityNbtTag = entity.getNBTTag();
+		        String entityCustomName = entityNbtTag.getCompound("MobDisplayName").toString();
+		        entity.setCustomName(entityCustomName);
+		        entity.setCustomNameVisible(true);
+		          
+	            //Particle effects ON SPAWN
+	            
+	            Location loc = new Location(entity.getWorld().getWorld(), (double)blockposition.getX(), (double)blockposition.getY(), (double)blockposition.getZ());
+	            FireworkUtil.spawnRandomFirework(loc);
+	            
+	            //a().triggerEffect(2004, blockposition, 0);
 	            if (entityinsentient != null) {
-	              entityinsentient.y();
+	              //entityinsentient.y();
 	            }
 	            flag = true;
 	          }
@@ -132,26 +168,34 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 	    a(1);
 	  }
 	  
-	  private Entity a(Entity entity, boolean flag)
-	  {
-	    if (i() != null)
-	    {
+	  private Entity a(Entity entity, boolean flag) {
+	    if (i() != null) {
 	      NBTTagCompound nbttagcompound = new NBTTagCompound();
 	      
 	      entity.d(nbttagcompound);
 	      Iterator iterator = i().c.c().iterator();
-	      while (iterator.hasNext())
-	      {
+	      while (iterator.hasNext()) {
 	        String s = (String)iterator.next();
 	        NBTBase nbtbase = i().c.get(s);
 	        
 	        nbttagcompound.set(s, nbtbase.clone());
 	      }
+	      
+	      NBTBase nameBase = new NBTTagString("§3§lMobby McMobface");
+	      nbttagcompound.set("MobDisplayName", nameBase);
+
+          NBTTagCompound entityNbtTag = entity.getNBTTag();
+          String entityCustomName = entityNbtTag.getCompound("MobDisplayName").toString();
+          entity.setCustomName(entityCustomName);
+          entity.setCustomNameVisible(true);
+          
 	      entity.f(nbttagcompound);
 	      if ((entity.world != null) && (flag)) {
 	        entity.world.addEntity(entity, CreatureSpawnEvent.SpawnReason.SPAWNER);
 	      }
 	      NBTTagCompound nbttagcompound1;
+	      
+	      //Riding entities (Jockey)
 	      for (Entity entity1 = entity; nbttagcompound.hasKeyOfType("Riding", 10); nbttagcompound = nbttagcompound1)
 	      {
 	        nbttagcompound1 = nbttagcompound.getCompound("Riding");
