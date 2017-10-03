@@ -1,5 +1,6 @@
 package com.codex.mobspawnerinjector.listeners;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,7 +14,9 @@ public class CustomSpawnerPlace implements Listener {
 	public void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		
-		SpawnerUtil.injectCustomSpawnerIntoTile(block);
+		if (block.getType() == Material.MOB_SPAWNER) {
+			SpawnerUtil.injectCustomSpawnerIntoTile(block);	
+		}
 		
 	}
 
