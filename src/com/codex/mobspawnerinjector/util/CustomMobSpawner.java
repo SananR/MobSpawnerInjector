@@ -2,11 +2,10 @@ package com.codex.mobspawnerinjector.util;
 
 import java.util.Iterator;
 import java.util.List;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
+import com.codex.mobspawnerinjector.util.CustomMobSpawner.a;
 import com.google.common.collect.Lists;
 
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
@@ -24,9 +23,11 @@ import net.minecraft.server.v1_8_R3.NBTTagList;
 import net.minecraft.server.v1_8_R3.UtilColor;
 import net.minecraft.server.v1_8_R3.WeightedRandom;
 
+@SuppressWarnings("unused")
 public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 
 	public int spawnDelay = 20;
+	
 	private String mobName = "Zombie";
 	private final List<a> mobs = Lists.newArrayList();
 	private a spawnData;
@@ -134,8 +135,6 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 						h();
 					}
 				}
-				
-				
 			}
 		}
 	}
@@ -172,7 +171,7 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 			entity.d(nbttagcompound);
 			
 			//Iterator for all of the NBTBase in the spawners NBTCompound
-			Iterator iterator = i().c.c().iterator();
+			Iterator<String> iterator = i().c.c().iterator();
 			
 			//Loop all of them
 			while (iterator.hasNext()) {
@@ -209,7 +208,7 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 					NBTTagCompound nbttagcompound2 = new NBTTagCompound();
 
 					entity2.d(nbttagcompound2);
-					Iterator iterator1 = nbttagcompound1.c().iterator();
+					Iterator<String> iterator1 = nbttagcompound1.c().iterator();
 					while (iterator1.hasNext()) {
 						String s1 = (String) iterator1.next();
 						NBTBase nbtbase1 = nbttagcompound1.get(s1);
@@ -260,7 +259,7 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 			if ((i() != null) || (this.mobs.size() > 0)) {
 				NBTTagList nbttaglist = new NBTTagList();
 				if (this.mobs.size() > 0) {
-					Iterator iterator = this.mobs.iterator();
+					Iterator<a> iterator = this.mobs.iterator();
 					while (iterator.hasNext()) {
 						a mobspawnerabstract_a = (a) iterator.next();
 
@@ -296,6 +295,7 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 	}
 
 	public class a extends WeightedRandom.WeightedRandomChoice {
+		
 		private final NBTTagCompound c;
 		private final String d;
 
