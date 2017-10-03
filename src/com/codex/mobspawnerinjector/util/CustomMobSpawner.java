@@ -38,20 +38,6 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 	private int maxNearbyEntities = 6;
 	private int requiredPlayerRange = 32;
 	private int spawnRange = 4;
-
-	//TODO REORGANIZE
-	public String getMobName() {
-		if (i() == null) {
-			if (this.mobName == null) {
-				this.mobName = "Pig";
-			}
-			if ((this.mobName != null) && (this.mobName.equals("Minecart"))) {
-				this.mobName = "MinecartRideable";
-			}
-			return this.mobName;
-		}
-		return i().d;
-	}
 	
 	// ALWAYS RUNNING (TICK)
 	@Override
@@ -133,9 +119,12 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 						// Firework when the entity spawns
 						Location loc = new Location(entity.getWorld().getWorld(), (double) blockposition.getX(),
 								(double) blockposition.getY(), (double) blockposition.getZ());
+						
 						FireworkUtil.spawnRandomFirework(loc);
 
 						//This code is for the smoke and flame particles. TODO: Replace with custom particles
+						ParticleUtil.createSpawnerParticleEffectAtLocation(loc);
+						
 						
 						// a().triggerEffect(2004, blockposition, 0);
 						//if (entityinsentient != null) {
@@ -291,6 +280,19 @@ public abstract class CustomMobSpawner extends MobSpawnerAbstract {
 
 	private a i() {
 		return this.spawnData;
+	}
+	
+	public String getMobName() {
+		if (i() == null) {
+			if (this.mobName == null) {
+				this.mobName = "Pig";
+			}
+			if ((this.mobName != null) && (this.mobName.equals("Minecart"))) {
+				this.mobName = "MinecartRideable";
+			}
+			return this.mobName;
+		}
+		return i().d;
 	}
 
 	public class a extends WeightedRandom.WeightedRandomChoice {
