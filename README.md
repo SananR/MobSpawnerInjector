@@ -1,1 +1,1 @@
-# PrimeMC-Prospect---Mob-Spawner-Injector
+Mob-Spawner-Injector
